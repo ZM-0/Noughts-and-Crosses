@@ -1,3 +1,11 @@
+// The SVG namespace
+const SVG_NS = "http://www.w3.org/2000/svg";
+
+
+// The current player's token
+const turn = "x";
+
+
 const win = function(token) {
 
 }
@@ -13,7 +21,21 @@ class Cell {
      * @param {number} column The cell's column index.
      */
     constructor(row, column) {
-        this.element = document.querySelector(`#cell-${row}-${column}`);
+        this.element = document.querySelector(`section#grid > div#cell-${row}-${column}`);
+
+        // Draw a preview on hover
+        
+        this.element.addEventListener("mouseenter", () => {
+            if (turn === "x") {
+                this.previewCross();
+            } else {
+                this.previewNought();
+            }
+        });
+
+        this.element.addEventListener("mouseleave", () => {
+            this.clear();
+        });
     }
 
     /**
@@ -26,24 +48,25 @@ class Cell {
     /**
      * Clears the cell and draws a nought on the cell.
      */
-    drawNought() {
+    drawNought(preview = false) {
         this.clear();
 
-        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        const svg = document.createElementNS(SVG_NS, "svg");
         svg.setAttribute("height", "100%");
         svg.setAttribute("width", "100%");
         svg.setAttribute("viewBox", "0 0 100 100");
 
-        const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        const circle = document.createElementNS(SVG_NS, "circle");
+        if (preview) circle.setAttribute("class", "preview");
         circle.setAttribute("cx", "50");
         circle.setAttribute("cy", "50");
         circle.setAttribute("r", "35");
         circle.setAttribute("fill", "none");
-        circle.setAttribute("stroke", "#1B4332");
+        circle.setAttribute("stroke", preview ? "#DEE2E6" : "#1B4332");
         circle.setAttribute("stroke-width", "3px");
         circle.setAttribute("stroke-linecap", "round");
         circle.setAttribute("stroke-dasharray", "1");
-        circle.setAttribute("stroke-dashoffset"," -1");
+        circle.setAttribute("stroke-dashoffset", preview ? "0" : "-1");
         circle.setAttribute("pathLength", "1");
         circle.setAttribute("transform", "rotate(-90 50 50)");
 
@@ -54,40 +77,56 @@ class Cell {
     /**
      * Clears the cell and draws a cross on the cell.
      */
-    drawCross() {
+    drawCross(preview = false) {
         this.clear();
 
-        const svg = document.createAttributeNS("http://www.w3.org/2000/svg", "svg");
+        const svg = document.createElementNS(SVG_NS, "svg");
         svg.setAttribute("height", "100%");
         svg.setAttribute("width", "100%");
         svg.setAttribute("viewBox", "0 0 100 100");
 
-        const line1 = document.createAttributeNS("http://www.w3.org/2000/svg", "line");
+        const line1 = document.createElementNS(SVG_NS, "line");
+        if (preview) line1.setAttribute("class", "preview");
         line1.setAttribute("x1", "85");
         line1.setAttribute("y1", "15");
         line1.setAttribute("x2", "15");
         line1.setAttribute("y2", "85");
-        line1.setAttribute("stroke", "#023E8A");
+        line1.setAttribute("stroke", preview ? "#DEE2E6" : "#023E8A");
         line1.setAttribute("stroke-width", "3px");
         line1.setAttribute("stroke-linecap", "round");
         line1.setAttribute("stroke-dasharray", "1");
-        line1.setAttribute("stroke-dashoffset", "1");
+        line1.setAttribute("stroke-dashoffset", preview ? "0" : "1");
         line1.setAttribute("pathLength", "1");
 
-        const line2 = document.createAttributeNS("http://www.w3.org/2000/svg", "line");
+        const line2 = document.createElementNS(SVG_NS, "line");
+        if (preview) line2.setAttribute("class", "preview");
         line2.setAttribute("x1", "15");
         line2.setAttribute("y1", "15");
         line2.setAttribute("x2", "85");
         line2.setAttribute("y2", "85");
-        line2.setAttribute("stroke", "#023E8A");
+        line2.setAttribute("stroke", preview ? "#DEE2E6" : "#023E8A");
         line2.setAttribute("stroke-width", "3px");
         line2.setAttribute("stroke-linecap", "round");
         line2.setAttribute("stroke-dasharray", "1");
-        line2.setAttribute("stroke-dashoffset", "1");
+        line2.setAttribute("stroke-dashoffset", preview ? "0" : "1");
         line2.setAttribute("pathLength", "1");
 
         svg.append(line1, line2);
         this.element.append(svg);
+    }
+
+    /**
+     * Previews a nought on the cell.
+     */
+    previewNought() {
+        this.drawNought(true);
+    }
+
+    /**
+     * Previews a cross on the cell.
+     */
+    previewCross() {
+        this.drawCross(true);
     }
 }
 
@@ -130,3 +169,4 @@ class Grid {
 
 const grid = new Grid();
 grid.cells[2][2].drawNought();
+grid.cells[1][1].previewCross();

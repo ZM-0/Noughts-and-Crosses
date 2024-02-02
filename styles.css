@@ -64,6 +64,10 @@ section#grid > div {
     background-color: #F8F9FA;
 }
 
+section#grid > div:hover {
+    cursor: pointer;
+}
+
 section#grid svg {
     position: absolute;
 }
@@ -80,7 +84,7 @@ section#grid svg {
     }
 }
 
-circle {
+circle:not(.preview) {
     animation-name: draw-nought;
     animation-duration: 1s;
     animation-timing-function: linear;
@@ -99,14 +103,14 @@ circle {
     }
 }
 
-line:first-child {
+line:not(.preview):first-child {
     animation-name: draw-cross;
     animation-duration: 0.5s;
     animation-timing-function: linear;
     animation-fill-mode: forwards;
 }
 
-line:last-child {
+line:not(.preview):last-child {
     animation-name: draw-cross;
     animation-duration: 0.5s;
     animation-timing-function: linear;
