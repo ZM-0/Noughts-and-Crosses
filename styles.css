@@ -7,6 +7,25 @@ html {
 }
 
 body {
+    display: block flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
     margin: 0;
-    background-color: #DBDBDB;
+    background-color: #F8F9FA;
+}
+
+section#grid {
+    display: block grid;
+    grid-template-rows: repeat(3, 1fr);
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 5px;
+    height: 50vmin;
+    width: 50vmin;
+    background-color: #343A40;
+}
+
+section#grid > div {
+    background-color: #F8F9FA;
 }
