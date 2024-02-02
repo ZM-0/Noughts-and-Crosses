@@ -67,3 +67,49 @@ section#grid > div {
 section#grid svg {
     position: absolute;
 }
+
+/* Nought Animation */
+
+@keyframes draw-nought {
+    0% {
+        stroke-dashoffset: -1;
+    }
+
+    100% {
+        stroke-dashoffset: 0;
+    }
+}
+
+circle {
+    animation-name: draw-nought;
+    animation-duration: 1s;
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
+}
+
+/* Cross Animation */
+
+@keyframes draw-cross {
+    0% {
+        stroke-dashoffset: 1;
+    }
+
+    100% {
+        stroke-dashoffset: 0;
+    }
+}
+
+line:first-child {
+    animation-name: draw-cross;
+    animation-duration: 0.5s;
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
+}
+
+line:last-child {
+    animation-name: draw-cross;
+    animation-duration: 0.5s;
+    animation-timing-function: linear;
+    animation-delay: 0.5s;
+    animation-fill-mode: forwards;
+}
