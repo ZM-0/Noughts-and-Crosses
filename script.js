@@ -404,7 +404,9 @@ class Grid {
             this.cells[Math.floor(index / 3)][index % 3].reset();
         }
 
+        turnDisplay.innerHTML = "Turn:";
         resetTurn(); 
+        gameOver = false;
         board.classList.remove("end");       
     }
 }
@@ -420,8 +422,9 @@ class Grid {
 const grid = new Grid();
 
 // Setup the game resetting
+
 const resetButton = document.querySelector("header button");
+
 resetButton.addEventListener("click", () => {
-    gameOver = false;
     grid.reset();
 });
