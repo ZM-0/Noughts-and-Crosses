@@ -155,7 +155,7 @@ line:not(.preview):last-child {
 
 @media (max-width: 500px) {
     section#grid {
-        height: 100vw;
-        width: 100vw;
+        height: 80vw;
+        width: 80vw;
     }
 }
