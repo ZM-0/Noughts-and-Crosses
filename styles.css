@@ -160,15 +160,15 @@ line:not(.preview):last-child {
     }
 
     circle:not(.preview) {
-        animation-duration: 0.7s;
+        animation-duration: 0.6s;
     }
 
     line:not(.preview):first-child {
-        animation-duration: 0.35s;
+        animation-duration: 0.3s;
     }
 
     line:not(.preview):last-child {
-        animation-duration: 0.35s;
-        animation-delay: 0.35s;
+        animation-duration: 0.3s;
+        animation-delay: 0.3s;
     }
 }
