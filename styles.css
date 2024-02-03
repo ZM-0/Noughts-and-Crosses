@@ -150,3 +150,12 @@ line:not(.preview):last-child {
     animation-delay: 0.5s;
     animation-fill-mode: forwards;
 }
+
+/* Small Screen Styles */
+
+@media (max-width: 450px) {
+    section#grid {
+        height: 80vmin;
+        width: 80vmin;
+    }
+}
