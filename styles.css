@@ -153,9 +153,9 @@ line:not(.preview):last-child {
 
 /* Small Screen Styles */
 
-@media (max-width: 450px) {
+@media (max-width: 500px) {
     section#grid {
-        height: 80vmin;
-        width: 80vmin;
+        height: 100vw;
+        width: 100vw;
     }
 }
