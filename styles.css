@@ -47,7 +47,7 @@ header h2.turn-nought::after {
     color: #1B4332;
 }
 
-/* Grid */
+/* Grid & Cells */
 
 section#grid {
     display: block grid;
@@ -71,6 +71,14 @@ section#grid > div:hover {
 
 section#grid svg {
     position: absolute;
+}
+
+section#grid > div.nought-win {
+    background-color: #D8F3DC;
+}
+
+section#grid > div.cross-win {
+    background-color: #CAF0F8;
 }
 
 /* Nought Animation */

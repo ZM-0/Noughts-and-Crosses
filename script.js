@@ -239,6 +239,14 @@ class Cell {
             changeTurn();
         });
     }
+
+    /**
+     * Highlights the cell to show a win line.
+     * @param {string} token The winning token.
+     */
+    showWin(token) {
+        this.element.classList.add(token === "x" ? "cross-win" : "nought-win");
+    }
 }
 
 
@@ -270,52 +278,70 @@ class Grid {
 
         // Check for a win after a move
         document.querySelector("section#grid").addEventListener("click", () => {
-            console.log(this.checkWin());
+            this.checkWin();
         });
     }
 
     /**
-     * Checks for a winning row.
-     * @returns True if the last move filled a row, else false.
+     * Checks for a winning row. Highlights the winning row if found.
      */
     checkRow() {
         const token = this.cells[lastRow][lastColumn].token;
-        return this.cells[lastRow][(lastColumn + 1) % 3].token === token && this.cells[lastRow][(lastColumn + 2) % 3].token === token;
+
+        if (this.cells[lastRow][(lastColumn + 1) % 3].token === token && this.cells[lastRow][(lastColumn + 2) % 3].token === token) {
+            this.cells[lastRow][lastColumn].showWin(token);
+            this.cells[lastRow][(lastColumn + 1) % 3].showWin(token);
+            this.cells[lastRow][(lastColumn + 2) % 3].showWin(token);
+        }
     }
 
     /**
-     * Checks for a winning column.
-     * @returns True if the last move filled a column, else false.
+     * Checks for a winning column. Highlights the winning column if found.
      */
     checkColumn() {
         const token = this.cells[lastRow][lastColumn].token;
-        return this.cells[(lastRow + 1) % 3][lastColumn].token === token && this.cells[(lastRow + 2) % 3][lastColumn].token === token;
+
+        if (this.cells[(lastRow + 1) % 3][lastColumn].token === token && this.cells[(lastRow + 2) % 3][lastColumn].token === token) {
+            this.cells[lastRow][lastColumn].showWin(token);
+            this.cells[(lastRow + 1) % 3][lastColumn].showWin(token);
+            this.cells[(lastRow + 2) % 3][lastColumn].showWin(token);
+        }
     }
 
     /**
-     * Checks for a winning forward diagonal.
-     * @returns True if the last move filled the forward-slashed diagonal, else false.
+     * Checks for a winning forward diagonal. Highlights the winning diagonal if found.
      */
     checkForwardDiagonal() {
         const token = this.cells[lastRow][lastColumn].token;
-        return this.cells[0][2].token === token && this.cells[1][1].token === token && this.cells[2][0].token === token;
+
+        if (this.cells[0][2].token === token && this.cells[1][1].token === token && this.cells[2][0].token === token) {
+            this.cells[0][2].showWin(token);
+            this.cells[1][1].showWin(token);
+            this.cells[2][0].showWin(token);
+        }
     }
 
     /**
-     * Checks for a winning backward diagonal.
-     * @returns True if the last move filled the backward-slashed diagonal, else false.
+     * Checks for a winning backward diagonal. Highlights the winning diagonal if found.
      */
     checkBackwardDiagonal() {
         const token = this.cells[lastRow][lastColumn].token;
-        return this.cells[0][0].token === token && this.cells[1][1].token === token && this.cells[2][2].token === token;
+
+        if (this.cells[0][0].token === token && this.cells[1][1].token === token && this.cells[2][2].token === token) {
+            this.cells[0][0].showWin(token);
+            this.cells[1][1].showWin(token);
+            this.cells[2][2].showWin(token);
+        }
     }
 
     /**
-     * Checks for a win.
-     * @returns True if the last move won the game, else false.
+     * Checks for a win. Highlights the winning line.
      */
     checkWin() {
-        return this.checkRow() || this.checkColumn() || this.checkForwardDiagonal() || this.checkBackwardDiagonal();
+        this.checkRow();
+        this.checkColumn();
+        this.checkForwardDiagonal();
+        this.checkBackwardDiagonal();
     }
 }
 
