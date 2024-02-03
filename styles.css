@@ -51,6 +51,7 @@ header h2.turn-nought::after {
 
 section#grid {
     display: block grid;
+    position: relative;
     grid-template-rows: repeat(3, 1fr);
     grid-template-columns: repeat(3, 1fr);
     grid-gap: 5px;
