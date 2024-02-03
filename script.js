@@ -1,8 +1,25 @@
 // The SVG namespace
 const SVG_NS = "http://www.w3.org/2000/svg";
 
+// The row and column indexes of the most recently drawn token
+let lastRow;
+let lastColumn;
+
+// The display for the current turn
+const turnDisplay = document.querySelector("header h2");
+
 // The current player's token
 let turn = "x";
+
+/**
+ * Changes the turn.
+ */
+const changeTurn = function() {
+    turn = turn === "x" ? "o" : "x";
+
+    turnDisplay.classList.remove(turn === "x" ? "turn-nought" : "turn-cross");
+    turnDisplay.classList.add(turn === "x" ? "turn-cross" : "turn-nought");
+}
 
 
 // ====================================================================================================
@@ -184,6 +201,11 @@ const previewCross = function(row, column) {
  * A cell in the grid. Handles user events on each cell, and manages the token on the cell.
  */
 class Cell {
+    /**
+     * Creates a new cell.
+     * @param {number} row The cell's row index.
+     * @param {number} column The cell's column index.
+     */
     constructor(row, column) {
         if (row < 0 || row > 2 || column < 0 || column > 2) throw new RangeError("Invalid row or column index");
 
@@ -211,7 +233,10 @@ class Cell {
             if (turn === "x") drawCross(row, column);
             else drawNought(row, column);
 
+            lastRow = row;
+            lastColumn = column;
             this.token = turn;
+            changeTurn();
         });
     }
 }
@@ -224,7 +249,13 @@ class Cell {
 // ====================================================================================================
 
 
+/**
+ * The grid of cells. Checks for a win.
+ */
 class Grid {
+    /**
+     * Creates a new grid.
+     */
     constructor() {
         this.cells = [];
 
@@ -236,6 +267,55 @@ class Grid {
                 this.cells[row].push(new Cell(row, column));
             }
         }
+
+        // Check for a win after a move
+        document.querySelector("section#grid").addEventListener("click", () => {
+            console.log(this.checkWin());
+        });
+    }
+
+    /**
+     * Checks for a winning row.
+     * @returns True if the last move filled a row, else false.
+     */
+    checkRow() {
+        const token = this.cells[lastRow][lastColumn].token;
+        return this.cells[lastRow][(lastColumn + 1) % 3].token === token && this.cells[lastRow][(lastColumn + 2) % 3].token === token;
+    }
+
+    /**
+     * Checks for a winning column.
+     * @returns True if the last move filled a column, else false.
+     */
+    checkColumn() {
+        const token = this.cells[lastRow][lastColumn].token;
+        return this.cells[(lastRow + 1) % 3][lastColumn].token === token && this.cells[(lastRow + 2) % 3][lastColumn].token === token;
+    }
+
+    /**
+     * Checks for a winning forward diagonal.
+     * @returns True if the last move filled the forward-slashed diagonal, else false.
+     */
+    checkForwardDiagonal() {
+        const token = this.cells[lastRow][lastColumn].token;
+        return this.cells[0][2].token === token && this.cells[1][1].token === token && this.cells[2][0].token === token;
+    }
+
+    /**
+     * Checks for a winning backward diagonal.
+     * @returns True if the last move filled the backward-slashed diagonal, else false.
+     */
+    checkBackwardDiagonal() {
+        const token = this.cells[lastRow][lastColumn].token;
+        return this.cells[0][0].token === token && this.cells[1][1].token === token && this.cells[2][2].token === token;
+    }
+
+    /**
+     * Checks for a win.
+     * @returns True if the last move won the game, else false.
+     */
+    checkWin() {
+        return this.checkRow() || this.checkColumn() || this.checkForwardDiagonal() || this.checkBackwardDiagonal();
     }
 }
 
