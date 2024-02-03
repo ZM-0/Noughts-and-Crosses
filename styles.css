@@ -28,6 +28,28 @@ header {
     align-items: center;
 }
 
+header button {
+    display: inline flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-family: inherit;
+    font-size: 100%;
+    background-color: transparent;
+    color: inherit;
+}
+
+header button:hover {
+    cursor: pointer;
+    background-color: #DEE2E6;
+}
+
+header button span {
+    font-size: 36px !important;
+}
+
 header h2 {
     display: inline flex;
     align-items: center;
@@ -67,7 +89,7 @@ section#grid > div {
     background-color: #F8F9FA;
 }
 
-section#grid > div:hover {
+section#grid:not(.end) > div:hover {
     cursor: pointer;
 }
 

@@ -8,6 +8,9 @@ let lastColumn;
 // Indicates if the game is over or not
 let gameOver = false;
 
+// The grid board element
+const board = document.querySelector("section#grid");
+
 // The display for the current turn
 const turnDisplay = document.querySelector("header h2");
 
@@ -389,6 +392,7 @@ class Grid {
             turnDisplay.innerHTML = "Winner:";
             toggleTurnIcon();
             gameOver = true;
+            board.classList.add("end");
         }
     }
 
@@ -400,7 +404,8 @@ class Grid {
             this.cells[Math.floor(index / 3)][index % 3].reset();
         }
 
-        resetTurn();        
+        resetTurn(); 
+        board.classList.remove("end");       
     }
 }
 
