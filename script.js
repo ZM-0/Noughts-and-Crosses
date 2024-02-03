@@ -8,11 +8,27 @@ let lastColumn;
 // Indicates if the game is over or not
 let gameOver = false;
 
+// Indicates if the next move is the first in a game
+let firstMove = true;
+
 // The grid board element
 const board = document.querySelector("section#grid");
 
 // The display for the current turn
 const turnDisplay = document.querySelector("header h2");
+
+// Changing start token
+
+const turnChangeButton = document.querySelector("header h2 button");
+
+turnChangeButton.addEventListener("click", () => {
+    if (!firstMove) return;
+    changeTurn();
+    turnChangeButton.setAttribute("disabled", "true");
+});
+
+// The display for the current token
+const turnIcon = document.querySelector("header h2 span");
 
 // The current player's token
 let turn = "x";
@@ -21,9 +37,10 @@ let turn = "x";
  * Changes the player icon without changing the turn.
  */
 const toggleTurnIcon = function() {
-    const noughtOn = turnDisplay.classList.contains("turn-nought");
-    turnDisplay.classList.remove(noughtOn ? "turn-nought" : "turn-cross");
-    turnDisplay.classList.add(noughtOn ? "turn-cross" : "turn-nought");
+    const noughtOn = turnIcon.classList.contains("nought");
+    turnIcon.classList.remove(noughtOn ? "nought" : "cross");
+    turnIcon.classList.add(noughtOn ? "cross" : "nought");
+    turnIcon.innerHTML = noughtOn ? "close" : "circle";
 }
 
 /**
@@ -40,8 +57,10 @@ const changeTurn = function() {
  */
 const resetTurn = function() {
     turn = "x";
-    turnDisplay.classList.remove("turn-nought");
-    turnDisplay.classList.add("turn-cross");
+    turnIcon.classList.remove("nought");
+    turnIcon.classList.add("cross");
+    turnIcon.innerHTML = "close";
+    turnChangeButton.removeAttribute("disabled");
 }
 
 
@@ -258,6 +277,7 @@ class Cell {
 
             lastRow = row;
             lastColumn = column;
+            if (firstMove) firstMove = false;
             this.token = turn;
             changeTurn();
         });
@@ -389,7 +409,7 @@ class Grid {
         if (gameOver) return;
 
         if (this.checkRow() || this.checkColumn() || this.checkForwardDiagonal() || this.checkBackwardDiagonal()) {
-            turnDisplay.innerHTML = "Winner:";
+            turnDisplay.replaceChildren("Winner:", turnChangeButton);
             toggleTurnIcon();
             gameOver = true;
             board.classList.add("end");
@@ -404,9 +424,10 @@ class Grid {
             this.cells[Math.floor(index / 3)][index % 3].reset();
         }
 
-        turnDisplay.innerHTML = "Turn:";
+        turnDisplay.replaceChildren("Turn:", turnChangeButton);
         resetTurn(); 
         gameOver = false;
+        firstMove = true;
         board.classList.remove("end");       
     }
 }
@@ -421,7 +442,7 @@ class Grid {
 
 const grid = new Grid();
 
-// Setup the game resetting
+// Game resetting
 
 const resetButton = document.querySelector("header button");
 

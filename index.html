@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="grid-icon.png" type="image/x-icon">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300,0,0">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0">
     <link rel="stylesheet" href="styles.css">
     <script src="script.js" async></script>
     <title>Noughts & Crosses</title>
@@ -15,7 +15,12 @@
       <button title="Reset">
         <span class="material-symbols-outlined">refresh</span>
       </button>
-      <h2 class="turn-cross">Turn:</h2>
+      <h2>
+        Turn:
+        <button title="Change starting player">
+          <span class="material-symbols-outlined cross">close</span>
+        </button>
+      </h2>
     </header>
     <section id="grid">
       <div id="cell-1-1"></div>

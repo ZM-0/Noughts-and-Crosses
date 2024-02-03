@@ -28,6 +28,8 @@ header {
     align-items: center;
 }
 
+/* Reset Button */
+
 header button {
     display: inline flex;
     flex-direction: column;
@@ -41,7 +43,7 @@ header button {
     color: inherit;
 }
 
-header button:hover {
+header button:enabled:hover {
     cursor: pointer;
     background-color: #DEE2E6;
 }
@@ -50,25 +52,25 @@ header button span {
     font-size: 36px !important;
 }
 
+/* Turn Indicator */
+
 header h2 {
     display: inline flex;
     align-items: center;
 }
 
-header h2.turn-cross::after {
-    content: "\E5CD";
+header h2 button {
     margin-left: 10px;
-    font-family: "Material Symbols Outlined";
-    font-size: 150% !important;
-    color: #023E8A;
 }
 
-header h2.turn-nought::after {
-    content: "\EF4A";
-    margin-left: 10px;
-    font-family: "Material Symbols Outlined";
+header h2 span.nought {
     font-size: 150% !important;
     color: #1B4332;
+}
+
+header h2 span.cross {
+    font-size: 150% !important;
+    color: #023E8A;
 }
 
 /* Grid & Cells */
