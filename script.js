@@ -1,6 +1,17 @@
 // The SVG namespace
 const SVG_NS = "http://www.w3.org/2000/svg";
 
+// The current player's token
+let turn = "x";
+
+
+// ====================================================================================================
+// 
+// Making, drawing, and previewing a nought on a cell.
+// 
+// ====================================================================================================
+
+
 /**
  * Creates an empty SVG element.
  * @returns An empty SVG element.
@@ -37,7 +48,7 @@ const makeCircle = function() {
  * @param {number} column The cell's column index to draw the nought.
  */
 const drawNought = function(row, column) {
-    if (row < 0 || row > 3 || column < 0 || column > 3) throw new RangeError("Invalid row or column index");
+    if (row < 0 || row > 2 || column < 0 || column > 2) throw new RangeError("Invalid row or column index");
     
     const circle = makeCircle();
     circle.setAttribute("stroke", "#1B4332");
@@ -47,6 +58,7 @@ const drawNought = function(row, column) {
     svg.append(circle);
 
     const cell = document.querySelector(`section#grid > div#cell-${row + 1}-${column + 1}`);
+    cell.replaceChildren();
     cell.append(svg);
 }
 
@@ -56,7 +68,7 @@ const drawNought = function(row, column) {
  * @param {number} column The cell's column index to preview the nought.
  */
 const previewNought = function(row, column) {
-    if (row < 0 || row > 3 || column < 0 || column > 3) throw new RangeError("Invalid row or column index");
+    if (row < 0 || row > 2 || column < 0 || column > 2) throw new RangeError("Invalid row or column index");
 
     const circle = makeCircle();
     circle.classList.add("preview");
@@ -66,8 +78,17 @@ const previewNought = function(row, column) {
     svg.append(circle);
 
     const cell = document.querySelector(`section#grid > div#cell-${row + 1}-${column + 1}`);
+    cell.replaceChildren();
     cell.append(svg);
 }
+
+
+// ====================================================================================================
+// 
+// Making, drawing, and previewing a cross on a cell.
+// 
+// ====================================================================================================
+
 
 /**
  * Creates the first line in an SVG cross.
@@ -109,7 +130,7 @@ const makeLine2 = function() {
  * @param {number} column The cell's column index to draw the cross.
  */
 const drawCross = function(row, column) {
-    if (row < 0 || row > 3 || column < 0 || column > 3) throw new RangeError("Invalid row or column index");
+    if (row < 0 || row > 2 || column < 0 || column > 2) throw new RangeError("Invalid row or column index");
     
     const line1 = makeLine1();
     line1.setAttribute("stroke", "#023E8A");
@@ -123,6 +144,7 @@ const drawCross = function(row, column) {
     svg.append(line1, line2);
 
     const cell = document.querySelector(`section#grid > div#cell-${row + 1}-${column + 1}`);
+    cell.replaceChildren();
     cell.append(svg);
 }
 
@@ -132,7 +154,7 @@ const drawCross = function(row, column) {
  * @param {number} column The cell's column index to preview the cross.
  */
 const previewCross = function(row, column) {
-    if (row < 0 || row > 3 || column < 0 || column > 3) throw new RangeError("Invalid row or column index");
+    if (row < 0 || row > 2 || column < 0 || column > 2) throw new RangeError("Invalid row or column index");
 
     const line1 = makeLine1();
     line1.classList.add("preview");
@@ -146,11 +168,75 @@ const previewCross = function(row, column) {
     svg.append(line1, line2);
 
     const cell = document.querySelector(`section#grid > div#cell-${row + 1}-${column + 1}`);
+    cell.replaceChildren();
     cell.append(svg);
 }
 
-previewNought(0, 0);
-drawNought(1, 1);
 
-previewCross(0, 2);
-drawCross(2, 1)
+// ====================================================================================================
+// 
+// Cell
+// 
+// ====================================================================================================
+
+
+/**
+ * A cell in the grid. Handles user events on each cell, and manages the token on the cell.
+ */
+class Cell {
+    constructor(row, column) {
+        if (row < 0 || row > 2 || column < 0 || column > 2) throw new RangeError("Invalid row or column index");
+
+        this.element = document.querySelector(`section#grid > div#cell-${row + 1}-${column + 1}`);
+        this.token = null;
+
+        // Show preview on hover
+        this.element.addEventListener("mouseenter", () => {
+            if (this.token !== null) return;
+
+            if (turn === "x") previewCross(row, column);
+            else previewNought(row, column);
+        });
+
+        // Remove preview after hover
+        this.element.addEventListener("mouseleave", () => {
+            if (this.token !== null) return;
+            this.element.replaceChildren();
+        });
+
+        // Draw token on click
+        this.element.addEventListener("click", () => {
+            if (this.token !== null) return;
+
+            if (turn === "x") drawCross(row, column);
+            else drawNought(row, column);
+
+            this.token = turn;
+        });
+    }
+}
+
+
+// ====================================================================================================
+// 
+// Grid
+// 
+// ====================================================================================================
+
+
+class Grid {
+    constructor() {
+        this.cells = [];
+
+        // Initialize the cells
+        for (let row = 0; row < 3; row++) {
+            this.cells.push([]);
+
+            for (let column = 0; column < 3; column++) {
+                this.cells[row].push(new Cell(row, column));
+            }
+        }
+    }
+}
+
+const grid = new Grid();
