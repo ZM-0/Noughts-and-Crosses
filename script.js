@@ -24,7 +24,6 @@ const turnChangeButton = document.querySelector("header h2 button");
 turnChangeButton.addEventListener("click", () => {
     if (!firstMove) return;
     changeTurn();
-    turnChangeButton.setAttribute("disabled", "true");
 });
 
 // The display for the current token
@@ -277,9 +276,13 @@ class Cell {
 
             lastRow = row;
             lastColumn = column;
-            if (firstMove) firstMove = false;
             this.token = turn;
             changeTurn();
+
+            if (firstMove) {
+                turnChangeButton.setAttribute("disabled", "true");
+                firstMove = false;
+            }
         });
     }
 
