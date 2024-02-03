@@ -3,11 +3,34 @@ const SVG_NS = "http://www.w3.org/2000/svg";
 
 
 // The current player's token
-const turn = "x";
+let turn = "x";
+
+// The turn display
+const turnDisplay = document.querySelector("header h2");
+
+/**
+ * Changes the turn.
+ */
+const changeTurn = function() {
+    turn = turn === "x" ? "o" : "x";
+
+    if (turn === "x") {
+        turnDisplay.classList.remove("turn-nought");
+        turnDisplay.classList.add("turn-cross");
+    } else {
+        turnDisplay.classList.remove("turn-cross");
+        turnDisplay.classList.add("turn-nought");
+    }
+}
 
 
+/**
+ * Processes a player winning.
+ * @param {string} token The winner's token.
+ */
 const win = function(token) {
-
+    turnDisplay.innerHTML = "Winner:";
+    changeTurn();
 }
 
 
@@ -17,24 +40,41 @@ const win = function(token) {
 class Cell {
     /**
      * Creates a new cell and links it with the DOM element.
-     * @param {number} row The cell's row index.
-     * @param {number} column The cell's column index.
+     * @param {number} row The cell's row number.
+     * @param {number} column The cell's column number.
+     * @param {Grid} grid The cell's grid.
      */
-    constructor(row, column) {
+    constructor(row, column, grid) {
         this.element = document.querySelector(`section#grid > div#cell-${row}-${column}`);
+        this.grid = grid;
+        this.row = row;
+        this.column = column;
+        this.symbol = null;
 
         // Draw a preview on hover
         
         this.element.addEventListener("mouseenter", () => {
-            if (turn === "x") {
-                this.previewCross();
-            } else {
-                this.previewNought();
-            }
+            if (this.symbol !== null) return;
+
+            if (turn === "x") this.previewCross();
+            else this.previewNought();
         });
 
         this.element.addEventListener("mouseleave", () => {
+            if (this.symbol !== null) return;
             this.clear();
+        });
+
+        // Draw the token on click
+        this.element.addEventListener("click", () => {
+            if (this.symbol !== null) return;
+
+            this.symbol = turn;
+
+            if (turn === "x") this.drawCross();
+            else this.drawNought();
+
+            changeTurn();
         });
     }
 
@@ -49,6 +89,7 @@ class Cell {
      * Clears the cell and draws a nought on the cell.
      */
     drawNought(preview = false) {
+        if (!preview) this.symbol = "o";
         this.clear();
 
         const svg = document.createElementNS(SVG_NS, "svg");
@@ -57,7 +98,7 @@ class Cell {
         svg.setAttribute("viewBox", "0 0 100 100");
 
         const circle = document.createElementNS(SVG_NS, "circle");
-        if (preview) circle.setAttribute("class", "preview");
+        if (preview) circle.classList.add("preview");
         circle.setAttribute("cx", "50");
         circle.setAttribute("cy", "50");
         circle.setAttribute("r", "35");
@@ -72,12 +113,15 @@ class Cell {
 
         svg.append(circle);
         this.element.append(svg);
+
+        if(!preview) this.grid.place(this.row - 1, this.column - 1, "o");
     }
 
     /**
      * Clears the cell and draws a cross on the cell.
      */
     drawCross(preview = false) {
+        if (!preview) this.symbol = "x";
         this.clear();
 
         const svg = document.createElementNS(SVG_NS, "svg");
@@ -86,7 +130,7 @@ class Cell {
         svg.setAttribute("viewBox", "0 0 100 100");
 
         const line1 = document.createElementNS(SVG_NS, "line");
-        if (preview) line1.setAttribute("class", "preview");
+        if (preview) line1.classList.add("preview");
         line1.setAttribute("x1", "85");
         line1.setAttribute("y1", "15");
         line1.setAttribute("x2", "15");
@@ -99,7 +143,7 @@ class Cell {
         line1.setAttribute("pathLength", "1");
 
         const line2 = document.createElementNS(SVG_NS, "line");
-        if (preview) line2.setAttribute("class", "preview");
+        if (preview) line2.classList.add("preview");
         line2.setAttribute("x1", "15");
         line2.setAttribute("y1", "15");
         line2.setAttribute("x2", "85");
@@ -113,6 +157,8 @@ class Cell {
 
         svg.append(line1, line2);
         this.element.append(svg);
+
+        if (!preview) this.grid.place(this.row - 1, this.column - 1, "x");
     }
 
     /**
@@ -140,26 +186,24 @@ class Grid {
             this.cells.push([]);
 
             for (let column = 1; column < 4; column++) {
-                this.cells[row - 1].push(new Cell(row, column));
+                this.cells[row - 1].push(new Cell(row, column, this));
             }
         }
     }
 
     checkHorizontal(row, column, token) {
-        return this.cells[row][(column + 1) % 3] === token && this.cells[row][(column + 2) % 3] === token;
+        return this.cells[row][(column + 1) % 3].symbol === token && this.cells[row][(column + 2) % 3].symbol === token;
     }
 
     checkVertical(row, column, token) {
-        return this.cells[(row + 1) % 3][column] === token && this.cells[(row + 2) % 3][column] === token;
+        return this.cells[(row + 1) % 3][column].symbol === token && this.cells[(row + 2) % 3][column].symbol === token;
     }
 
     checkDiagonals(row, column, token) {
-        return row === 1 && column === 1 && (this.cells[0][0] === token && this.cells[2][2] === token || this.cells[2][0] === token && this.cells[0][2] === token);
+        return row === 1 && column === 1 && (this.cells[0][0].symbol === token && this.cells[2][2].symbol === token || this.cells[2][0].symbol === token && this.cells[0][2].symbol === token);
     }
 
     place(row, column, token) {
-        this.cells[row][column] = token;
-
         if (this.checkHorizontal(row, column, token) || this.checkVertical(row, column, token) || this.checkDiagonals(row, column, token)) {
             win(token);
         }
@@ -168,5 +212,3 @@ class Grid {
 
 
 const grid = new Grid();
-grid.cells[2][2].drawNought();
-grid.cells[1][1].previewCross();
