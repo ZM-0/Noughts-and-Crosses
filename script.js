@@ -5,6 +5,9 @@ const SVG_NS = "http://www.w3.org/2000/svg";
 let lastRow;
 let lastColumn;
 
+// Indicates if the game is over or not
+let gameOver = false;
+
 // The display for the current turn
 const turnDisplay = document.querySelector("header h2");
 
@@ -12,13 +15,30 @@ const turnDisplay = document.querySelector("header h2");
 let turn = "x";
 
 /**
+ * Changes the player icon without changing the turn.
+ */
+const toggleTurnIcon = function() {
+    const noughtOn = turnDisplay.classList.contains("turn-nought");
+    turnDisplay.classList.remove(noughtOn ? "turn-nought" : "turn-cross");
+    turnDisplay.classList.add(noughtOn ? "turn-cross" : "turn-nought");
+}
+
+/**
  * Changes the turn.
  */
 const changeTurn = function() {
     turn = turn === "x" ? "o" : "x";
+    toggleTurnIcon();
+}
 
-    turnDisplay.classList.remove(turn === "x" ? "turn-nought" : "turn-cross");
-    turnDisplay.classList.add(turn === "x" ? "turn-cross" : "turn-nought");
+
+/**
+ * Resets the turn to crosses.
+ */
+const resetTurn = function() {
+    turn = "x";
+    turnDisplay.classList.remove("turn-nought");
+    turnDisplay.classList.add("turn-cross");
 }
 
 
@@ -214,7 +234,7 @@ class Cell {
 
         // Show preview on hover
         this.element.addEventListener("mouseenter", () => {
-            if (this.token !== null) return;
+            if (this.token !== null || gameOver) return;
 
             if (turn === "x") previewCross(row, column);
             else previewNought(row, column);
@@ -222,13 +242,13 @@ class Cell {
 
         // Remove preview after hover
         this.element.addEventListener("mouseleave", () => {
-            if (this.token !== null) return;
+            if (this.token !== null || gameOver) return;
             this.element.replaceChildren();
         });
 
         // Draw token on click
         this.element.addEventListener("click", () => {
-            if (this.token !== null) return;
+            if (this.token !== null || gameOver) return;
 
             if (turn === "x") drawCross(row, column);
             else drawNought(row, column);
@@ -246,6 +266,15 @@ class Cell {
      */
     showWin(token) {
         this.element.classList.add(token === "x" ? "cross-win" : "nought-win");
+    }
+
+    /**
+     * Resets the cell.
+     */
+    reset() {
+        this.token = null;
+        this.element.replaceChildren();
+        this.element.classList.remove("nought-win", "cross-win");
     }
 }
 
@@ -284,65 +313,110 @@ class Grid {
 
     /**
      * Checks for a winning row. Highlights the winning row if found.
+     * @returns True if there is a winning row, else false.
      */
     checkRow() {
         const token = this.cells[lastRow][lastColumn].token;
-
-        if (this.cells[lastRow][(lastColumn + 1) % 3].token === token && this.cells[lastRow][(lastColumn + 2) % 3].token === token) {
+        const win = this.cells[lastRow][(lastColumn + 1) % 3].token === token && this.cells[lastRow][(lastColumn + 2) % 3].token === token;
+        
+        if (win) {
             this.cells[lastRow][lastColumn].showWin(token);
             this.cells[lastRow][(lastColumn + 1) % 3].showWin(token);
             this.cells[lastRow][(lastColumn + 2) % 3].showWin(token);
         }
+
+        return win;
     }
 
     /**
      * Checks for a winning column. Highlights the winning column if found.
+     * @returns True if there is a winning column, else false.
      */
     checkColumn() {
         const token = this.cells[lastRow][lastColumn].token;
-
-        if (this.cells[(lastRow + 1) % 3][lastColumn].token === token && this.cells[(lastRow + 2) % 3][lastColumn].token === token) {
+        const win = this.cells[(lastRow + 1) % 3][lastColumn].token === token && this.cells[(lastRow + 2) % 3][lastColumn].token === token;
+        
+        if (win) {
             this.cells[lastRow][lastColumn].showWin(token);
             this.cells[(lastRow + 1) % 3][lastColumn].showWin(token);
             this.cells[(lastRow + 2) % 3][lastColumn].showWin(token);
         }
+
+        return win;
     }
 
     /**
      * Checks for a winning forward diagonal. Highlights the winning diagonal if found.
+     * @returns True if there is a winning forward diagonal, else false.
      */
     checkForwardDiagonal() {
         const token = this.cells[lastRow][lastColumn].token;
-
-        if (this.cells[0][2].token === token && this.cells[1][1].token === token && this.cells[2][0].token === token) {
+        const win = this.cells[0][2].token === token && this.cells[1][1].token === token && this.cells[2][0].token === token;
+        
+        if (win) {
             this.cells[0][2].showWin(token);
             this.cells[1][1].showWin(token);
             this.cells[2][0].showWin(token);
         }
+
+        return win;
     }
 
     /**
      * Checks for a winning backward diagonal. Highlights the winning diagonal if found.
+     * @returns True if there is a winning backward diagonal, else false.
      */
     checkBackwardDiagonal() {
         const token = this.cells[lastRow][lastColumn].token;
-
-        if (this.cells[0][0].token === token && this.cells[1][1].token === token && this.cells[2][2].token === token) {
+        const win = this.cells[0][0].token === token && this.cells[1][1].token === token && this.cells[2][2].token === token;
+        
+        if (win) {
             this.cells[0][0].showWin(token);
             this.cells[1][1].showWin(token);
             this.cells[2][2].showWin(token);
         }
+
+        return win;
     }
 
     /**
      * Checks for a win. Highlights the winning line.
      */
     checkWin() {
-        this.checkRow();
-        this.checkColumn();
-        this.checkForwardDiagonal();
-        this.checkBackwardDiagonal();
+        if (gameOver) return;
+
+        if (this.checkRow() || this.checkColumn() || this.checkForwardDiagonal() || this.checkBackwardDiagonal()) {
+            turnDisplay.innerHTML = "Winner:";
+            toggleTurnIcon();
+            gameOver = true;
+        }
+    }
+
+    /**
+     * Resets the grid.
+     */
+    reset() {
+        for (let index = 0; index < 9; index++) {
+            this.cells[Math.floor(index / 3)][index % 3].reset();
+        }
+
+        resetTurn();        
     }
 }
 
+
+// ====================================================================================================
+// 
+// Main
+// 
+// ====================================================================================================
+
+
 const grid = new Grid();
+
+// Setup the game resetting
+const resetButton = document.querySelector("header button");
+resetButton.addEventListener("click", () => {
+    gameOver = false;
+    grid.reset();
+});

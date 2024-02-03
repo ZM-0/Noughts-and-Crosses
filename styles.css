@@ -23,7 +23,9 @@ body {
 /* Header */
 
 header {
-    text-align: center;
+    display: block flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 header h2 {
