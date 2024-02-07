@@ -1,0 +1,15 @@
+{
+  "name": "noughts-and-crosses",
+  "version": "1.0.0",
+  "description": "Two-player noughts and crosses. There is a 3x3 grid of cells.\r Players take turns marking the cells with their symbol.\r The first player who gets three symbols in a row horizontally, vertically, or diagonally wins.",
+  "main": "script.js",
+  "scripts": {
+    "test": "npx jasmine-browser-runner runSpecs"
+  },
+  "keywords": [],
+  "author": "",
+  "devDependencies": {
+    "jasmine-browser-runner": "^2.3.0",
+    "jasmine-core": "^5.1.1"
+  }
+}
