@@ -331,9 +331,13 @@ class Grid {
             }
         }
 
-        // Check for a win after a move
         document.querySelector("section#grid").addEventListener("click", () => {
-            this.checkWin();
+            // Check for a win after a move. If there is no win, but the board is full, there's a draw.
+            if (!this.checkWin() && this.checkFull()) {
+                turnDisplay.replaceChildren("Draw");
+                gameOver = true;
+                board.classList.add("end");
+            }
         });
     }
 
@@ -407,6 +411,7 @@ class Grid {
 
     /**
      * Checks for a win. Highlights the winning line.
+     * @returns A boolean indicating if there is a win.
      */
     checkWin() {
         if (gameOver) return;
@@ -416,7 +421,24 @@ class Grid {
             toggleTurnIcon();
             gameOver = true;
             board.classList.add("end");
+            return true;
         }
+
+        return false;
+    }
+
+    /**
+     * Checks if the board is full. This will enable draw detection.
+     * @returns A boolean indicating if the board is full.
+     */
+    checkFull() {
+        for (let index = 0; index < 9; index++) {
+            if (this.cells[Math.floor(index / 3)][index % 3].token === null) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
