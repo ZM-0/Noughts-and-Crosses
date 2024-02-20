@@ -3,8 +3,8 @@
  */
 export var Turn;
 (function (Turn) {
-    Turn[Turn["NOUGHT"] = 0] = "NOUGHT";
-    Turn[Turn["CROSS"] = 1] = "CROSS";
+    Turn[Turn["NOUGHT"] = 1] = "NOUGHT";
+    Turn[Turn["CROSS"] = 2] = "CROSS";
 })(Turn || (Turn = {}));
 /**
  * Maintains information about a game, such as whose turn it is and what was the latest move.
@@ -44,5 +44,7 @@ export class Game {
      */
     reset() {
         this._turn = Turn.CROSS;
+        this.isOver = false;
+        this.started = false;
     }
 }

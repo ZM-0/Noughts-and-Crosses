@@ -1,44 +1,9 @@
 import { Turn } from "./game.js";
-import { turnSwitchButton } from "./script.js";
+import { switchTurnButton, turnIcon } from "./script.js";
 /**
- * A cell in the grid. The cell manages any token on itself.
+ * A cell in a grid. Handles user input on itself and manages and displays any token on itself.
  */
 export class Cell {
-    /**
-     * The cell's position.
-     */
-    position;
-    /**
-     * The token on the cell.
-     */
-    token = null;
-    /**
-     * Creates a new cell.
-     * @param {number} row The cell's row index.
-     * @param {number} column The cell's column index.
-     */
-    constructor(row, column) {
-        if (row < 0 || row > 2 || column < 0 || column > 2)
-            throw new RangeError("Invalid row or column index");
-        this.position = [row, column];
-    }
-    /**
-     * Gets the cell's row index.
-     */
-    get row() {
-        return this.position[0];
-    }
-    /**
-     * Gets the cell's column index.
-     */
-    get column() {
-        return this.position[1];
-    }
-}
-/**
- * Responsible for handling user input on the cell and displaying any token on it.
- */
-export class CellController {
     /**
      * The SVG namespace
      */
@@ -60,50 +25,50 @@ export class CellController {
      */
     element;
     /**
-     * The cell being managed.
+     * The token on the cell.
      */
-    cell;
+    token = null;
     /**
      * Creates a new cell view.
-     * @param {Cell} cell The cell being managed.
+     * @param {number} row The cell's row index.
+     * @param {number} column The cell's column index.
      * @param {Game} game The current game.
      */
-    constructor(cell, game) {
-        this.element = document.querySelector(`section#grid > div#cell-${cell.row + 1}-${cell.column + 1}`);
-        this.cell = cell;
+    constructor(row, column, game) {
+        this.element = document.querySelector(`section#grid > div#cell-${row + 1}-${column + 1}`);
         // Show preview on hover
         this.element.addEventListener("mouseenter", () => {
-            if (cell.token || game.isOver)
+            if (this.token || game.isOver)
                 return;
             this.draw(game.turn, true);
         });
         // Remove preview after hover
         this.element.addEventListener("mouseleave", () => {
-            if (cell.token || game.isOver)
+            if (this.token || game.isOver)
                 return;
             this.element.replaceChildren();
         });
         // Draw token on click
         this.element.addEventListener("click", () => {
-            if (cell.token || game.isOver)
+            if (this.token || game.isOver)
                 return;
             this.draw(game.turn);
-            cell.token = game.turn;
-            game.lastPosition = [cell.row, cell.column];
+            this.token = game.turn;
+            game.lastPosition = [row, column];
             game.switchTurn();
+            turnIcon.switch();
             if (!game.started) {
-                turnSwitchButton.setAttribute("disabled", "true");
+                switchTurnButton.setAttribute("disabled", "true");
                 game.started = true;
             }
         });
-        ;
     }
     /**
      * Creates an empty SVG element.
      * @returns An empty SVG element.
      */
     makeSVG() {
-        const svg = document.createElementNS(CellController.SVG_NS, "svg");
+        const svg = document.createElementNS(Cell.SVG_NS, "svg");
         svg.setAttribute("height", "100%");
         svg.setAttribute("width", "100%");
         svg.setAttribute("viewBox", "0 0 100 100");
@@ -114,7 +79,7 @@ export class CellController {
      * @returns A colourless default circle for a nought.
      */
     makeCircle() {
-        const circle = document.createElementNS(CellController.SVG_NS, "circle");
+        const circle = document.createElementNS(Cell.SVG_NS, "circle");
         circle.setAttribute("cx", "50");
         circle.setAttribute("cy", "50");
         circle.setAttribute("r", "35");
@@ -132,7 +97,7 @@ export class CellController {
      */
     drawNought(preview = false) {
         const circle = this.makeCircle();
-        circle.setAttribute("stroke", preview ? CellController.PREVIEW_COLOUR : CellController.NOUGHT_COLOUR);
+        circle.setAttribute("stroke", preview ? Cell.PREVIEW_COLOUR : Cell.NOUGHT_COLOUR);
         if (preview) {
             circle.classList.add("preview");
         }
@@ -141,15 +106,14 @@ export class CellController {
         }
         const svg = this.makeSVG();
         svg.append(circle);
-        this.element.replaceChildren();
-        this.element.append(svg);
+        this.element.replaceChildren(svg);
     }
     /**
      * Creates the first line in an SVG cross.
      * @returns A colourless default forward-slanting line for a cross.
      */
     makeLine1() {
-        const line1 = document.createElementNS(CellController.SVG_NS, "line");
+        const line1 = document.createElementNS(Cell.SVG_NS, "line");
         line1.setAttribute("x1", "85");
         line1.setAttribute("y1", "15");
         line1.setAttribute("x2", "15");
@@ -165,7 +129,7 @@ export class CellController {
      * @returns A colourless default backward-slanting line for a cross.
      */
     makeLine2() {
-        const line2 = document.createElementNS(CellController.SVG_NS, "line");
+        const line2 = document.createElementNS(Cell.SVG_NS, "line");
         line2.setAttribute("x1", "15");
         line2.setAttribute("y1", "15");
         line2.setAttribute("x2", "85");
@@ -183,8 +147,8 @@ export class CellController {
     drawCross(preview = false) {
         const line1 = this.makeLine1();
         const line2 = this.makeLine2();
-        line1.setAttribute("stroke", preview ? CellController.PREVIEW_COLOUR : CellController.CROSS_COLOUR);
-        line2.setAttribute("stroke", preview ? CellController.PREVIEW_COLOUR : CellController.CROSS_COLOUR);
+        line1.setAttribute("stroke", preview ? Cell.PREVIEW_COLOUR : Cell.CROSS_COLOUR);
+        line2.setAttribute("stroke", preview ? Cell.PREVIEW_COLOUR : Cell.CROSS_COLOUR);
         if (preview) {
             line1.classList.add("preview");
             line2.classList.add("preview");
@@ -195,8 +159,7 @@ export class CellController {
         }
         const svg = this.makeSVG();
         svg.append(line1, line2);
-        this.element.replaceChildren();
-        this.element.append(svg);
+        this.element.replaceChildren(svg);
     }
     /**
      * Draws or previews a token on the cell.
@@ -215,7 +178,7 @@ export class CellController {
      */
     highlight(highlight) {
         if (highlight) {
-            this.element.classList.add(this.cell.token === Turn.CROSS ? "cross-win" : "nought-win");
+            this.element.classList.add(this.token === Turn.CROSS ? "cross-win" : "nought-win");
         }
         else {
             this.element.classList.remove("nought-win", "cross-win");
@@ -225,7 +188,7 @@ export class CellController {
      * Resets the cell and its display.
      */
     reset() {
-        this.cell.token = null;
+        this.token = null;
         this.element.replaceChildren();
         this.highlight(false);
     }

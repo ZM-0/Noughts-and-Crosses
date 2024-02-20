@@ -2,7 +2,7 @@
  * Identifies the players.
  */
 export enum Turn {
-    NOUGHT,
+    NOUGHT = 1,
     CROSS
 }
 
@@ -49,5 +49,7 @@ export class Game {
      */
     public reset(): void {
         this._turn = Turn.CROSS;
+        this.isOver = false;
+        this.started = false;
     }
 }

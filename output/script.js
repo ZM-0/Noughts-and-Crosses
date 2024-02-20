@@ -1,47 +1,48 @@
 import { Game } from "./game.js";
 import { Grid } from "./grid.js";
-// The grid board element
-export const board = document.querySelector("section#grid");
-// The display for the current turn
-export const turnDisplay = document.querySelector("header h2");
-// The display for the current token
-const turnIcon = document.querySelector("header h2 span");
-/**
- * Changes the player icon without changing the turn.
- */
-export const switchTurnIcon = function () {
-    const noughtOn = turnIcon.classList.contains("nought");
-    turnIcon.classList.remove(noughtOn ? "nought" : "cross");
-    turnIcon.classList.add(noughtOn ? "cross" : "nought");
-    turnIcon.innerHTML = noughtOn ? "close" : "circle";
-};
-/**
- * Resets the turn to crosses.
- */
-export const resetTurn = function () {
-    game.reset();
-    turnIcon.classList.remove("nought");
-    turnIcon.classList.add("cross");
-    turnIcon.innerHTML = "close";
-    turnSwitchButton.removeAttribute("disabled");
-};
-// ====================================================================================================
-// 
-// Main
-// 
-// ====================================================================================================
 const game = new Game();
 const grid = new Grid(game);
+// The current turn display
+export const turnDisplay = {
+    element: document.querySelector("header h2"),
+    showWinner() {
+        this.element.replaceChildren("Winner:", switchTurnButton);
+    },
+    showDraw() {
+        this.element.replaceChildren("Draw");
+    },
+    reset() {
+        this.element.replaceChildren("Turn:", switchTurnButton);
+    }
+};
+// The current token display
+export const turnIcon = {
+    element: document.querySelector("header h2 span"),
+    switch() {
+        const noughtOn = this.element.classList.contains("nought");
+        this.element.classList.remove(noughtOn ? "nought" : "cross");
+        this.element.classList.add(noughtOn ? "cross" : "nought");
+        this.element.innerHTML = noughtOn ? "close" : "circle";
+    },
+    reset() {
+        this.element.classList.replace("nought", "cross");
+        this.element.innerHTML = "close";
+        switchTurnButton.removeAttribute("disabled");
+    }
+};
 // User input to change starting player
-export const turnSwitchButton = document.querySelector("header h2 button");
-turnSwitchButton.addEventListener("click", () => {
+export const switchTurnButton = document.querySelector("header h2 button");
+switchTurnButton.addEventListener("click", () => {
     if (!game.started) {
         game.switchTurn();
-        switchTurnIcon();
+        turnIcon.switch();
     }
 });
 // Game resetting
 const resetButton = document.querySelector("header button");
 resetButton.addEventListener("click", () => {
+    game.reset();
     grid.reset();
+    turnDisplay.reset();
+    turnIcon.reset();
 });
