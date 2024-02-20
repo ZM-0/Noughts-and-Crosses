@@ -13,7 +13,7 @@ export class Game {
     /**
      * Indicates whose turn it is.
      */
-    turn = Turn.CROSS;
+    _turn = Turn.CROSS;
     /**
      * Stores the position of the cell draw on in the last move.
      */
@@ -27,4 +27,22 @@ export class Game {
      * Indicates if the game has started.
      */
     started = false;
+    /**
+     * Gets the current turn.
+     */
+    get turn() {
+        return this._turn;
+    }
+    /**
+     * Switches the turn between the players.
+     */
+    switchTurn() {
+        this._turn = this._turn === Turn.CROSS ? Turn.NOUGHT : Turn.CROSS;
+    }
+    /**
+     * Resets the game.
+     */
+    reset() {
+        this._turn = Turn.CROSS;
+    }
 }

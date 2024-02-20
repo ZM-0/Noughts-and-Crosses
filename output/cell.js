@@ -1,5 +1,5 @@
 import { Turn } from "./game.js";
-import { changeTurn, turnChangeButton } from "./script.js";
+import { turnSwitchButton } from "./script.js";
 // The SVG namespace
 const SVG_NS = "http://www.w3.org/2000/svg";
 // The preview colour for tokens
@@ -173,9 +173,9 @@ export class Cell {
                 drawNought(this.element);
             game.lastPosition = [row, column];
             this.token = game.turn;
-            changeTurn();
+            game.switchTurn();
             if (!game.started) {
-                turnChangeButton.setAttribute("disabled", "true");
+                turnSwitchButton.setAttribute("disabled", "true");
                 game.started = true;
             }
         });

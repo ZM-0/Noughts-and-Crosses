@@ -1,41 +1,19 @@
 import { Cell } from "./cell.js";
 import { Game, Turn } from "./game.js";
 
-// The row and column indexes of the most recently drawn token
-let lastRow: number;
-let lastColumn: number;
-
-// Indicates if the game is over or not
-let gameOver = false;
-
-// Indicates if the next move is the first in a game
-let firstMove = true;
-
 // The grid board element
 const board = document.querySelector("section#grid")!;
 
 // The display for the current turn
 const turnDisplay = document.querySelector("header h2")!;
 
-// Changing start token
-
-export const turnChangeButton = document.querySelector("header h2 button")!;
-
-turnChangeButton.addEventListener("click", () => {
-    if (!firstMove) return;
-    changeTurn();
-});
-
 // The display for the current token
 const turnIcon = document.querySelector("header h2 span")!;
-
-// The current player's token
-let turn = "x";
 
 /**
  * Changes the player icon without changing the turn.
  */
-const toggleTurnIcon = function() {
+const switchTurnIcon = function() {
     const noughtOn = turnIcon.classList.contains("nought");
     turnIcon.classList.remove(noughtOn ? "nought" : "cross");
     turnIcon.classList.add(noughtOn ? "cross" : "nought");
@@ -43,23 +21,14 @@ const toggleTurnIcon = function() {
 }
 
 /**
- * Changes the turn.
- */
-export const changeTurn = function() {
-    turn = turn === "x" ? "o" : "x";
-    toggleTurnIcon();
-}
-
-
-/**
  * Resets the turn to crosses.
  */
 const resetTurn = function() {
-    turn = "x";
+    game.reset();
     turnIcon.classList.remove("nought");
     turnIcon.classList.add("cross");
     turnIcon.innerHTML = "close";
-    turnChangeButton.removeAttribute("disabled");
+    turnSwitchButton.removeAttribute("disabled");
 }
 
 
@@ -99,10 +68,22 @@ class Grid {
             // Check for a win after a move. If there is no win, but the board is full, there's a draw.
             if (!this.checkWin() && this.checkFull()) {
                 turnDisplay.replaceChildren("Draw");
-                gameOver = true;
+                game.isOver = true;
                 board.classList.add("end");
             }
         });
+    }
+
+    /**
+     * Gets a cell from the grid.
+     * @param row The row index.
+     * @param column The column index.
+     * @returns The cell.
+     * @throws RangeError if either index is out of bounds.
+     */
+    private get(row: number, column: number): Cell {
+        if (row < 0 || row > 2 || column < 0 || column > 2) throw new RangeError("Invalid cell row or column index");
+        return this.cells[row][column];
     }
 
     /**
@@ -110,13 +91,14 @@ class Grid {
      * @returns True if there is a winning row, else false.
      */
     checkRow() {
-        const token: Turn = this.cells[lastRow][lastColumn].token!;
-        const win: boolean = this.cells[lastRow][(lastColumn + 1) % 3].token === token && this.cells[lastRow][(lastColumn + 2) % 3].token === token;
+        const [row, column] = game.lastPosition!;
+        const token: Turn = this.get(row, column).token!;
+        const win: boolean = this.cells[row][(column + 1) % 3].token === token && this.cells[row][(column + 2) % 3].token === token;
         
         if (win) {
-            this.cells[lastRow][lastColumn].showWin(token);
-            this.cells[lastRow][(lastColumn + 1) % 3].showWin(token);
-            this.cells[lastRow][(lastColumn + 2) % 3].showWin(token);
+            this.cells[row][column].showWin(token);
+            this.cells[row][(column + 1) % 3].showWin(token);
+            this.cells[row][(column + 2) % 3].showWin(token);
         }
 
         return win;
@@ -127,13 +109,14 @@ class Grid {
      * @returns True if there is a winning column, else false.
      */
     checkColumn() {
-        const token: Turn = this.cells[lastRow][lastColumn].token!;
-        const win: boolean = this.cells[(lastRow + 1) % 3][lastColumn].token === token && this.cells[(lastRow + 2) % 3][lastColumn].token === token;
+        const [row, column] = game.lastPosition!;
+        const token: Turn = this.get(row, column).token!;
+        const win: boolean = this.cells[(row + 1) % 3][column].token === token && this.cells[(row + 2) % 3][column].token === token;
         
         if (win) {
-            this.cells[lastRow][lastColumn].showWin(token);
-            this.cells[(lastRow + 1) % 3][lastColumn].showWin(token);
-            this.cells[(lastRow + 2) % 3][lastColumn].showWin(token);
+            this.cells[row][column].showWin(token);
+            this.cells[(row + 1) % 3][column].showWin(token);
+            this.cells[(row + 2) % 3][column].showWin(token);
         }
 
         return win;
@@ -144,7 +127,8 @@ class Grid {
      * @returns True if there is a winning forward diagonal, else false.
      */
     checkForwardDiagonal() {
-        const token: Turn = this.cells[lastRow][lastColumn].token!;
+        const [row, column] = game.lastPosition!;
+        const token: Turn = this.get(row, column).token!;
         const win: boolean = this.cells[0][2].token === token && this.cells[1][1].token === token && this.cells[2][0].token === token;
         
         if (win) {
@@ -161,7 +145,8 @@ class Grid {
      * @returns True if there is a winning backward diagonal, else false.
      */
     checkBackwardDiagonal() {
-        const token: Turn = this.cells[lastRow][lastColumn].token!;
+        const [row, column] = game.lastPosition!;
+        const token: Turn = this.get(row, column).token!;
         const win: boolean = this.cells[0][0].token === token && this.cells[1][1].token === token && this.cells[2][2].token === token;
         
         if (win) {
@@ -178,12 +163,12 @@ class Grid {
      * @returns A boolean indicating if there is a win.
      */
     checkWin() {
-        if (gameOver) return;
+        if (game.isOver) return;
 
         if (this.checkRow() || this.checkColumn() || this.checkForwardDiagonal() || this.checkBackwardDiagonal()) {
-            turnDisplay.replaceChildren("Winner:", turnChangeButton);
-            toggleTurnIcon();
-            gameOver = true;
+            turnDisplay.replaceChildren("Winner:", turnSwitchButton);
+            switchTurnIcon();
+            game.isOver = true;
             board.classList.add("end");
             return true;
         }
@@ -213,10 +198,10 @@ class Grid {
             this.cells[Math.floor(index / 3)][index % 3].reset();
         }
 
-        turnDisplay.replaceChildren("Turn:", turnChangeButton);
+        turnDisplay.replaceChildren("Turn:", turnSwitchButton);
         resetTurn(); 
-        gameOver = false;
-        firstMove = true;
+        game.isOver = false;
+        game.started = false;
         board.classList.remove("end");       
     }
 }
@@ -231,6 +216,17 @@ class Grid {
 
 const game: Game = new Game();
 const grid: Grid = new Grid(game);
+
+// User input to change starting player
+
+export const turnSwitchButton: HTMLButtonElement = document.querySelector("header h2 button")!;
+
+turnSwitchButton.addEventListener("click", () => {
+    if (!game.started) {
+        game.switchTurn();
+        switchTurnIcon();
+    }
+});
 
 // Game resetting
 
