@@ -1,4 +1,4 @@
-import { Cell } from "./cell.js";
+import { Cell, CellController } from "./cell.js";
 import { Game, Turn } from "./game.js";
 
 // The grid board element
@@ -46,21 +46,27 @@ class Grid {
     /**
      * The cells in the grid.
      */
-    private readonly cells: Cell[][];
+    private readonly cells: Cell[][] = [];
+
+    /**
+     * The cell controllers.
+     */
+    private readonly controllers: CellController[][] = [];
     
     /**
      * Creates a new grid.
      * @param {Game} game The game being played.
      */
-    constructor(game: Game) {
-        this.cells = [];
-
+    public constructor(game: Game) {
         // Initialize the cells
         for (let row = 0; row < 3; row++) {
             this.cells.push([]);
+            this.controllers.push([]);
 
             for (let column = 0; column < 3; column++) {
-                this.cells[row].push(new Cell(row, column, game));
+                const cell: Cell = new Cell(row, column);
+                this.cells[row].push(cell);
+                this.controllers[row].push(new CellController(cell, game));
             }
         }
 
@@ -96,9 +102,9 @@ class Grid {
         const win: boolean = this.cells[row][(column + 1) % 3].token === token && this.cells[row][(column + 2) % 3].token === token;
         
         if (win) {
-            this.cells[row][column].showWin(token);
-            this.cells[row][(column + 1) % 3].showWin(token);
-            this.cells[row][(column + 2) % 3].showWin(token);
+            this.controllers[row][column].highlight(true);
+            this.controllers[row][(column + 1) % 3].highlight(true);
+            this.controllers[row][(column + 2) % 3].highlight(true);
         }
 
         return win;
@@ -114,9 +120,9 @@ class Grid {
         const win: boolean = this.cells[(row + 1) % 3][column].token === token && this.cells[(row + 2) % 3][column].token === token;
         
         if (win) {
-            this.cells[row][column].showWin(token);
-            this.cells[(row + 1) % 3][column].showWin(token);
-            this.cells[(row + 2) % 3][column].showWin(token);
+            this.controllers[row][column].highlight(true);
+            this.controllers[(row + 1) % 3][column].highlight(true);
+            this.controllers[(row + 2) % 3][column].highlight(true);
         }
 
         return win;
@@ -132,9 +138,9 @@ class Grid {
         const win: boolean = this.cells[0][2].token === token && this.cells[1][1].token === token && this.cells[2][0].token === token;
         
         if (win) {
-            this.cells[0][2].showWin(token);
-            this.cells[1][1].showWin(token);
-            this.cells[2][0].showWin(token);
+            this.controllers[0][2].highlight(true);
+            this.controllers[1][1].highlight(true);
+            this.controllers[2][0].highlight(true);
         }
 
         return win;
@@ -150,9 +156,9 @@ class Grid {
         const win: boolean = this.cells[0][0].token === token && this.cells[1][1].token === token && this.cells[2][2].token === token;
         
         if (win) {
-            this.cells[0][0].showWin(token);
-            this.cells[1][1].showWin(token);
-            this.cells[2][2].showWin(token);
+            this.controllers[0][0].highlight(true);
+            this.controllers[1][1].highlight(true);
+            this.controllers[2][2].highlight(true);
         }
 
         return win;
@@ -195,7 +201,7 @@ class Grid {
      */
     reset() {
         for (let index = 0; index < 9; index++) {
-            this.cells[Math.floor(index / 3)][index % 3].reset();
+            this.controllers[Math.floor(index / 3)][index % 3].reset();
         }
 
         turnDisplay.replaceChildren("Turn:", turnSwitchButton);
