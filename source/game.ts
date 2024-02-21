@@ -49,6 +49,7 @@ export class Game {
      */
     public reset(): void {
         this._turn = Turn.CROSS;
+        this.lastPosition = null;
         this.isOver = false;
         this.started = false;
     }

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en-GB" dir="ltr">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/node_modules/mocha/mocha.css">
+    <script src="/node_modules/mocha/mocha.js"></script>
+    <script src="/node_modules/chai/chai.js" type="module"></script>
+    <script>
+      mocha.setup("bdd");
+    </script>
+    <script src="/output/test/game.test.js" type="module"></script>
+    <script type="module">
+      mocha.run();
+    </script>
+    <title>Tests</title>
+  </head>
+  <body>
+    <div id="mocha"></div>
+  </body>
+</html>
