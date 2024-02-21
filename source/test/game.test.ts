@@ -1,4 +1,4 @@
-import { expect } from "../../node_modules/chai/chai.js";
+import { expect } from "/node_modules/chai/chai.js";
 import { Game, Turn } from "../game.js";
 
 describe("Game", () => {

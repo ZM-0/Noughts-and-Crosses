@@ -1,1 +1,5 @@
-"use strict";
+describe("Grid", () => {
+    describe("constructor()", () => {
+    });
+});
+export {};
